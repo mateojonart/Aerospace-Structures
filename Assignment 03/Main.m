@@ -1,4 +1,5 @@
-% Main code for the Aerospace Structures algorithm.
+% Main code for the Aerospace Structures algorithm requires to be compiled
+% with all other functions in the same folder in order to run.
 
 clc
 clear

@@ -1,3 +1,6 @@
+% Function to assemble the global stiffness matrix and the force element
+% vector.
+
 function [K,f] = assemblyFunction(data,Td,Kel,fel)
 
     K = zeros(data.ndof, data.ndof);
