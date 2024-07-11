@@ -1,3 +1,5 @@
+% Main code for the Aerospace Structures algorithm.
+
 clc
 clear
 close all
