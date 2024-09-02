@@ -1,5 +1,5 @@
 %% STRUCTURAL PROBLEM CODE STRUCTURE
-
+aa
 clear
 close all
 clc
