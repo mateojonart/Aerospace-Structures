@@ -1,5 +1,5 @@
 %% STRUCTURAL PROBLEM CODE STRUCTURE
-bb
+
 clear
 close all
 clc
@@ -80,6 +80,15 @@ F = [% Each row is a point force component | column_1 = node, column_2 = directi
 ];
 
 %% 2) SOLVER
+
+s.data = data;
+s.m = m;
+s.td = Td;
+s.tn = Tn;
+s.tm = Tm;
+s.x = x;
+computer = GlobalStiffnessMatrixComputer(s);
+K2 = computer.compute;
 
 % 2.1.1 Compute element stiffness matrices
 Kel = stiffnessFunction(data,x,Tn,m,Tm);
