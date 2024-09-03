@@ -87,8 +87,9 @@ s.td = Td;
 s.tn = Tn;
 s.tm = Tm;
 s.x = x;
+s.p = p;
 computer = GlobalStiffnessMatrixComputer(s);
-K2 = computer.compute;
+[K2,f2] = computer.compute;
 
 % 2.1.1 Compute element stiffness matrices
 Kel = stiffnessFunction(data,x,Tn,m,Tm);
@@ -98,12 +99,20 @@ Fel = forceFunction(data,x,Tn,m,Tm);
 
 % 2.2 Assemble global stiffness matrix
 [K,f] = assemblyFunction(data,Td,Kel,Fel);
+s.K = K;
+s.f = f;
+s.F = F;
+
+selector = 2;
+solver = Solver(selector,s);
+[u2,r2] = solver.solve;
 
 % 2.3.1 Apply prescribed DOFs
 [up,vp] = applyBC(data,p);
 
 % 2.3.2 Apply point loads
 f = pointLoads(data,f,F);
+f2 = pointLoads(data,f2,F);
 
 % 2.4 Solve system
 [u,r] = solveSystem(data,K,f,up,vp);

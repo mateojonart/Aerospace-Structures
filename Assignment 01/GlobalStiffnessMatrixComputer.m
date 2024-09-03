@@ -20,10 +20,10 @@ classdef GlobalStiffnessMatrixComputer < handle
             obj.td = cParams.td;
         end
 
-        function K = compute(obj)
+        function [K,f] = compute(obj)
             Kel = obj.stiffnessFunction();
             Fel = obj.forceFunction();
-            K = obj.assemblyFunction(Kel,Fel);
+            [K,f] = obj.assemblyFunction(Kel,Fel);
         end
     end
 
@@ -54,7 +54,7 @@ classdef GlobalStiffnessMatrixComputer < handle
             nel = obj.data.nel;
             Fel = zeros(nne*ni,nel);
             for ii = 1:nel
-                [xel] = [obj.x(obj.tn(ii,:),:)];
+                xel = [obj.x(obj.tn(ii,:),:)];
                 l = sqrt((xel(2,1) - xel(1,1))^2 + (xel(2,2) - xel(1,2))^2);
                 c = (xel(2,1)-xel(1,1))/l;
                 s = (xel(2,2)-xel(1,2))/l;
@@ -68,7 +68,7 @@ classdef GlobalStiffnessMatrixComputer < handle
             end
         end
 
-        function K = assemblyFunction(obj,Kel,Fel)
+        function [K,f] = assemblyFunction(obj,Kel,Fel)
             ndof = obj.data.ndof;
             nel = obj.data.nel;
             nne = obj.data.nne;
