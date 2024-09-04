@@ -5,9 +5,9 @@ classdef Solver < handle
         function stype = create(cParams)
             switch cParams.type
                 case {"direct"}
-                    stype = DirectSolver();
+                    stype = Direct_Solver();
                 case {"iterative"}
-                    stype = IterativeSolver();
+                    stype = Iterative_pcg_Solver();
                 otherwise 
                     error('Invalid solver type')
             end

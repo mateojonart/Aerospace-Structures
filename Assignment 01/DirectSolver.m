@@ -47,7 +47,9 @@ classdef DirectSolver < handle
             vf = setdiff((1:ndof)',vp);
             u = zeros(ndof,1);
             u(vp) = up;
-            u(vf) = obj.k(vf,vf)\(obj.f1(vf)-obj.k(vf,vp)*u(vp));
+            A = obj.k(vf,vf);
+            b = obj.f1(vf)-obj.k(vf,vp)*u(vp);
+            u(vf) = A\b;
             r = obj.k(vp,:)*u - obj.f1(vp);
         end
     end
