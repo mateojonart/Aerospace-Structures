@@ -7,9 +7,9 @@ classdef Solver < handle
                 case {"direct"}
                     stype = Direct_Solver();
                 case {"iterative"}
-                    stype = Iterative_pcg_Solver();
+                    stype = Iterative_pcg_Solver(cParams);
                 otherwise 
-                    error('Invalid solver type')
+                    error('Solver:InvalidType', 'Invalid solver type');
             end
         end
     end

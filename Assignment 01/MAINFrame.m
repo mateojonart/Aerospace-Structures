@@ -88,8 +88,20 @@ s.tn = Tn;
 s.tm = Tm;
 s.x = x;
 s.p = p;
-computer = GlobalStiffnessMatrixComputer(s);
-[K2,f2] = computer.compute;
+s.F = F;
+
+stiffnessComputer = GlobalStiffnessMatrixComputer(s);
+forceComputer = GlobalForceVectorComputer(s);
+s.K = stiffnessComputer.compute();
+s.f = forceComputer.compute();
+creator = SystemCreator(s);
+[A,b] = creator.create();
+s.x0 = zeros(size(b));
+s.type = 'iterative';
+s.tol = 1e-6;
+s.maxIt = 15000;
+solver = Solver.create(s);
+u2 = zeros(s.data.ndof,1);
 
 % 2.1.1 Compute element stiffness matrices
 Kel = stiffnessFunction(data,x,Tn,m,Tm);
@@ -99,16 +111,15 @@ Fel = forceFunction(data,x,Tn,m,Tm);
 
 % 2.2 Assemble global stiffness matrix
 [K,f] = assemblyFunction(data,Td,Kel,Fel);
-s.K = K;
-s.f = f;
-s.F = F;
 
 % 2.3.1 Apply prescribed DOFs
 [up,vp] = applyBC(data,p);
+vf = setdiff((1:data.ndof)',vp);
+
+u2(vf) = solver.solve(A,b);
 
 % 2.3.2 Apply point loads
 f = pointLoads(data,f,F);
-f2 = pointLoads(data,f2,F);
 
 % 2.4 Solve system
 [u,r] = solveSystem(data,K,f,up,vp);
@@ -122,7 +133,7 @@ scale = 1; % Set a number to visualize deformed structure properly
 units = 'MPa'; % Define in which units you're providing the stress vector
 safetyfactor = 2.5; % Set the convenient safety factor
 
-plot2DBars(data,x,Tn,u,sig*1e-6,scale,units);
+% plot2DBars(data,x,Tn,u,sig*1e-6,scale,units);
 
 % Returns which elements do fail by buckling
 Fail = buckling(data,x,Tn,sig,m,Tm);
