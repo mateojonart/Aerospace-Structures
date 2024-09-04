@@ -1,4 +1,4 @@
-classdef Direct_Solver < handle
+classdef DirectSolver < handle
 
     methods (Static)
 

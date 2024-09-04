@@ -1,4 +1,4 @@
-classdef Iterative_pcg_Solver < handle
+classdef IterativeSolver < handle
     
     properties (Access = private)
         x0
@@ -8,7 +8,7 @@ classdef Iterative_pcg_Solver < handle
 
     methods (Access = public)
 
-        function obj = Iterative_pcg_Solver(cParams)
+        function obj = IterativeSolver(cParams)
             Iterative_pcg_Solver.validateParams(cParams);
             obj.x0 = cParams.x0;
             obj.tol = cParams.tol;
