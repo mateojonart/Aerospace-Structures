@@ -2,12 +2,14 @@ classdef Solver < handle
 
     methods (Static)
 
-        function [u,r] = create(cParams)
+        function stype = create(cParams)
             switch cParams.type
                 case {"direct"}
-                    [u,r] = DirectSolver();
+                    stype = DirectSolver();
                 case {"iterative"}
-                    [u,r] = IterativeSolver();
+                    stype = IterativeSolver();
+                otherwise 
+                    error('Invalid solver type')
             end
         end
     end
