@@ -9,7 +9,7 @@ classdef IterativeSolver < handle
     methods (Access = public)
 
         function obj = IterativeSolver(cParams)
-            Iterative_pcg_Solver.validateParams(cParams);
+            IterativeSolver.validateParams(cParams);
             obj.x0 = cParams.x0;
             obj.tol = cParams.tol;
             obj.maxIt = cParams.maxIt;

@@ -101,7 +101,6 @@ s.type = 'iterative';
 s.tol = 1e-6;
 s.maxIt = 15000;
 solver = Solver.create(s);
-u2 = zeros(s.data.ndof,1);
 
 % 2.1.1 Compute element stiffness matrices
 Kel = stiffnessFunction(data,x,Tn,m,Tm);
@@ -115,6 +114,9 @@ Fel = forceFunction(data,x,Tn,m,Tm);
 % 2.3.1 Apply prescribed DOFs
 [up,vp] = applyBC(data,p);
 vf = setdiff((1:data.ndof)',vp);
+
+vfcomputer = VfComputer(s);
+[up2,vf2] = vfcomputer.compute();
 
 u2(vf) = solver.solve(A,b);
 
