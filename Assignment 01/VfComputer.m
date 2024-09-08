@@ -9,10 +9,10 @@ classdef VfComputer < handle
 
         function obj = VfComputer(cParams)
             obj.data = cParams.data;
-            obj.p = cParams.p;
+            obj.p = cParams.prescribDOF;
         end
 
-        function [up,vf] = compute(obj)
+        function [up,vp,vf] = compute(obj)
             [up,vp] = obj.applyBC();
             vf = obj.calculateVf(vp);
         end

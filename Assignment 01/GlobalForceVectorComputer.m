@@ -14,12 +14,12 @@ classdef GlobalForceVectorComputer < handle
 
         function obj = GlobalForceVectorComputer(cParams)
             obj.data = cParams.data;
-            obj.m = cParams.m;
-            obj.x = cParams.x;
-            obj.tn = cParams.tn;
-            obj.tm = cParams.tm;
-            obj.td = cParams.td;
-            obj.extForces = cParams.F;
+            obj.m = cParams.matProp;
+            obj.x = cParams.coord;
+            obj.tn = cParams.connec;
+            obj.tm = cParams.connecMat;
+            obj.td = cParams.connecDOF;
+            obj.extForces = cParams.extForces;
         end
 
         function f = compute(obj)

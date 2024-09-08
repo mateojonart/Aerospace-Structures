@@ -10,7 +10,7 @@ classdef SystemCreator < handle
     methods (Access = public)
         function obj = SystemCreator(cParams)
             obj.k = cParams.K;
-            obj.p = cParams.p;
+            obj.p = cParams.prescribDOF;
             obj.f = cParams.f;
             obj.data = cParams.data;
         end
