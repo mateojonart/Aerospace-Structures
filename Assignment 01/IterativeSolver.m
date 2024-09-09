@@ -1,56 +1,52 @@
 classdef IterativeSolver < handle
-
+    
     properties (Access = private)
-        k
-        p
-        data
-        f1
-        extForces
+        x0
+        tol
+        maxIt
     end
 
     methods (Access = public)
+
         function obj = IterativeSolver(cParams)
-            obj.k = cParams.K;
-            obj.p = cParams.p;
-            obj.f1 = cParams.f;
-            obj.data = cParams.data;
-            obj.extForces = cParams.F;
+            obj.validateParams(cParams);
+            obj.x0 = cParams.x0;
+            obj.tol = cParams.tol;
+            obj.maxIt = cParams.maxIt;
         end
 
-        function [u,r] = solve(obj)
-            [up,vp] = obj.applyBC();
-            obj.f1 = obj.pointLoads();
-            [u,r] = obj.solveSystem(up,vp);
+        function x = solve(obj,A,b)
+            x = pcg(A,b,obj.tol,obj.maxIt,[],[],obj.x0);
         end
+
     end
 
-    methods (Access = private)
-        function [up,vp] = applyBC(obj)
-            ni = obj.data.ni;
-            up = zeros(size(obj.p,1),1);
-            vp = zeros(size(obj.p,1),1);
-            for ii = 1:size(obj.p,1)
-                vp(ii) = nod2dof(ni,obj.p(ii,1),obj.p(ii,2));
-                up(ii) = obj.p(ii,3);
+    methods (Static, Access = private)
+
+        function validateParams(cParams)
+
+            if ~isfield(cParams, 'x0') || isempty(cParams.x0)
+                error('Iterative_pcg_Solver:MissingField','x0 is required');
             end
+
+            if ~isfield(cParams, 'tol') || isempty(cParams.tol)
+                error('Iterative_pcg_Solver:MissingField','tol is required');
+            end
+
+            if ~isfield(cParams, 'maxIt') || isempty(cParams.maxIt)
+                error('Iterative_pcg_Solver:MissingField','maxIt is required');
+            end
+
+            if cParams.tol <= 0
+                error('Iterative_pcg_Solver:InvalidTolerance','Tolerance (tol) must be a positive number');
+            end
+
+            if ~isnumeric(cParams.maxIt) || numel(cParams.maxIt) ~= 1 || cParams.maxIt <= 0 || cParams.maxIt ~= floor(cParams.maxIt)
+                error('Iterative_pcg_Solver:InvalidMaxIterations','Maximum iterations (maxIt) must be a positive integer');
+            end
+
         end
 
-        function f = pointLoads(obj)
-            ni = obj.data.ni;
-            Fext = zeros(size(obj.f1));
-            Fext(nod2dof(ni,obj.extForces(:,1),obj.extForces(:,2))) = obj.extForces(:,3);
-            f = obj.f1 + Fext;
-        end
-
-        function [u,r] = solveSystem(obj,up,vp)
-            ndof = obj.data.ndof;
-            vf = setdiff((1:ndof)',vp);
-            u = zeros(ndof,1);
-            u(vp) = up;
-            A = obj.k(vf,vf);
-            b = obj.f1(vf)-obj.k(vf,vp)*u(vp);
-            u(vf) = pcg(A,b,1e-8,100);
-            r = obj.k(vp,:)*u - obj.f1(vp);
-        end
     end
+
 end

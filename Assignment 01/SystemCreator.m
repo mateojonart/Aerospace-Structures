@@ -1,26 +1,23 @@
-classdef IterativeSolver < handle
+classdef SystemCreator < handle
 
     properties (Access = private)
         k
         p
         data
-        f1
-        extForces
+        f
     end
 
     methods (Access = public)
-        function obj = IterativeSolver(cParams)
+        function obj = SystemCreator(cParams)
             obj.k = cParams.K;
-            obj.p = cParams.p;
-            obj.f1 = cParams.f;
+            obj.p = cParams.prescribDOF;
+            obj.f = cParams.f;
             obj.data = cParams.data;
-            obj.extForces = cParams.F;
         end
 
-        function [u,r] = solve(obj)
+        function [A,b] = create(obj)
             [up,vp] = obj.applyBC();
-            obj.f1 = obj.pointLoads();
-            [u,r] = obj.solveSystem(up,vp);
+            [A,b] = obj.solveSystem(up,vp);
         end
     end
 
@@ -35,22 +32,13 @@ classdef IterativeSolver < handle
             end
         end
 
-        function f = pointLoads(obj)
-            ni = obj.data.ni;
-            Fext = zeros(size(obj.f1));
-            Fext(nod2dof(ni,obj.extForces(:,1),obj.extForces(:,2))) = obj.extForces(:,3);
-            f = obj.f1 + Fext;
-        end
-
-        function [u,r] = solveSystem(obj,up,vp)
+        function [A,b] = solveSystem(obj,up,vp)
             ndof = obj.data.ndof;
             vf = setdiff((1:ndof)',vp);
             u = zeros(ndof,1);
             u(vp) = up;
             A = obj.k(vf,vf);
-            b = obj.f1(vf)-obj.k(vf,vp)*u(vp);
-            u(vf) = pcg(A,b,1e-8,1e6);
-            r = obj.k(vp,:)*u - obj.f1(vp);
+            b = obj.f(vf)-obj.k(vf,vp)*u(vp);
         end
     end
 end

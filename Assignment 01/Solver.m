@@ -1,24 +1,15 @@
 classdef Solver < handle
 
-    properties (Access = public)
-        solverSelector
-        cParams
-    end
+    methods (Static)
 
-    methods (Access = public)
-        function obj = Solver(solverSelector,cParams)
-            obj.solverSelector = solverSelector;
-            obj.cParams = cParams;
-        end
-
-        function [u,r] = solve(obj)
-            switch obj.solverSelector
-                case 1                                      % Direct
-                    thisObj = DirectSolver(obj.cParams);
-                    [u,r] = thisObj.solve;
-                case 2                                      % Iterative
-                    thisObj = IterativeSolver(obj.cParams);
-                    [u,r] = thisObj.solve;
+        function stype = create(cParams)
+            switch cParams.type
+                case {"direct"}
+                    stype = DirectSolver();
+                case {"iterative"}
+                    stype = IterativeSolver(cParams);
+                otherwise 
+                    error('Solver:InvalidType', 'Invalid solver type');
             end
         end
     end

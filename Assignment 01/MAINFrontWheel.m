@@ -133,7 +133,7 @@ scale = 100; % Set a number to visualize deformed structure properly
 units = 'MPa'; % Define in which units you're providing the stress vector
 safetyfactor = 2.5; % Set the convenient safety factor
 
-plot2DBars(data,x,Tn,u,sig*1e-6,scale,units);
+% plot2DBars(data,x,Tn,u,sig*1e-6,scale,units);
 
 % Returns which elements do fail by buckling
 [SigCrit,Fail] = buckling(data,x,Tn,sig,m,Tm);
