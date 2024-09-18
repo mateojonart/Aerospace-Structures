@@ -28,7 +28,7 @@ classdef TestDisp < handle
         end
 
         function  u = solveAndCheckProblem(obj,sParams)
-            u = obj.solvingProcess(sParams);
+            u = obj.solveProblem(sParams);
             obj.verifyResults(u)
         end
     end
@@ -51,7 +51,7 @@ classdef TestDisp < handle
             obj.trueDisplacements = cParams.trueDisplacements;
         end
 
-        function u = solvingProcess(obj,sParams)
+        function u = solveProblem(obj,sParams)
             obj.K = GlobalStiffnessMatrixComputer(sParams).compute();
             obj.f = GlobalForceVectorComputer(sParams).compute();
             [A,b] = SystemCreator(obj).create();

@@ -2,11 +2,11 @@ classdef GlobalForceVectorComputer < handle
 
     properties (Access = private)
         data
-        m
-        x
-        tn
-        tm
-        td
+        matProp
+        coord
+        connec
+        connecMat
+        connecDOF
         extForces
     end
 
@@ -14,11 +14,11 @@ classdef GlobalForceVectorComputer < handle
 
         function obj = GlobalForceVectorComputer(cParams)
             obj.data = cParams.data;
-            obj.m = cParams.matProp;
-            obj.x = cParams.coord;
-            obj.tn = cParams.connec;
-            obj.tm = cParams.connecMat;
-            obj.td = cParams.connecDOF;
+            obj.matProp = cParams.matProp;
+            obj.coord = cParams.coord;
+            obj.connec = cParams.connec;
+            obj.connecMat = cParams.connecMat;
+            obj.connecDOF = cParams.connecDOF;
             obj.extForces = cParams.extForces;
         end
 
@@ -37,7 +37,7 @@ classdef GlobalForceVectorComputer < handle
             nel = obj.data.nel;
             Fel = zeros(nne*ni,nel);
             for ii = 1:nel
-                xel = [obj.x(obj.tn(ii,:),:)];
+                xel = [obj.coord(obj.connec(ii,:),:)];
                 l = sqrt((xel(2,1) - xel(1,1))^2 + (xel(2,2) - xel(1,2))^2);
                 c = (xel(2,1)-xel(1,1))/l;
                 s = (xel(2,2)-xel(1,2))/l;
@@ -45,8 +45,8 @@ classdef GlobalForceVectorComputer < handle
                     -s c 0 0;
                     0 0 c s;
                     0 0 -s c];
-                A = obj.m(obj.tm(ii),2);
-                sigma0 = obj.m(obj.tm(ii),3);
+                A = obj.matProp(obj.connecMat(ii),2);
+                sigma0 = obj.matProp(obj.connecMat(ii),3);
                 Fel(:,ii) = -sigma0.*A.*R'*[-1; 0; 1; 0];
             end
         end
@@ -59,7 +59,7 @@ classdef GlobalForceVectorComputer < handle
             f = zeros(ndof,1);
             for ii = 1:nel
                 for jj = 1:(nne*ni)
-                    f(obj.td(ii,jj)) = f(obj.td(ii,jj)) + Fel(jj,ii);
+                    f(obj.connecDOF(ii,jj)) = f(obj.connecDOF(ii,jj)) + Fel(jj,ii);
                 end
             end
         end
