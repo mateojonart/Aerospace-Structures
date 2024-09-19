@@ -1,27 +1,26 @@
-classdef SystemCreator < handle
+classdef DOFComputer < handle
 
     properties (Access = private)
-        K
-        prescribDOF
         data
-        f
+        prescribDOF
     end
 
     methods (Access = public)
-        function obj = SystemCreator(cParams)
-            obj.K = cParams.K;
-            obj.prescribDOF = cParams.prescribDOF;
-            obj.f = cParams.f;
+
+        function obj = DOFComputer(cParams)
             obj.data = cParams.data;
+            obj.prescribDOF = cParams.prescribDOF;
         end
 
-        function [A,b] = create(obj)
+        function [up,vp,vf] = computeDOF(obj)
             [up,vp] = obj.applyBC();
-            [A,b] = obj.solveSystem(up,vp);
+            vf = obj.calculateVf(vp);
         end
+
     end
 
     methods (Access = private)
+
         function [up,vp] = applyBC(obj)
             ni = obj.data.ni;
             up = zeros(size(obj.prescribDOF,1),1);
@@ -32,13 +31,10 @@ classdef SystemCreator < handle
             end
         end
 
-        function [A,b] = solveSystem(obj,up,vp)
-            ndof = obj.data.ndof;
-            vf = setdiff((1:ndof)',vp);
-            u = zeros(ndof,1);
-            u(vp) = up;
-            A = obj.K(vf,vf);
-            b = obj.f(vf)-obj.K(vf,vp)*u(vp);
+        function vf = calculateVf(obj,vp)
+            vf = setdiff((1:obj.data.ndof)',vp);
         end
+
     end
+
 end

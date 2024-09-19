@@ -5,4 +5,4 @@ close all
 filename = "FrontWheelData.m";
 run(filename)
 test = TestDisp(s);
-hasPassed = test.solveAndCheckProblem(s);
+hasPassed = test.solveAndCheckProblem();

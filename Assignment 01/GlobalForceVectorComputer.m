@@ -23,15 +23,14 @@ classdef GlobalForceVectorComputer < handle
         end
 
         function f = compute(obj)
-            Fel = obj.forceFunction();
-            f_prov = obj.assemblyFunction(Fel);
-            f = obj.pointLoads(f_prov);
+            Fel = obj.calculateElemForce();
+            f = obj.assembleElemForces(Fel);
         end
     end
 
     methods (Access = private)
 
-        function Fel = forceFunction(obj)
+        function Fel = calculateElemForce(obj)
             nne = obj.data.nne;
             ni = obj.data.ni;
             nel = obj.data.nel;
@@ -51,21 +50,17 @@ classdef GlobalForceVectorComputer < handle
             end
         end
 
-        function f = assemblyFunction(obj,Fel)
+        function f = assembleElemForces(obj,Fel)
             ndof = obj.data.ndof;
             nel = obj.data.nel;
             nne = obj.data.nne;
             ni = obj.data.ni;
-            f = zeros(ndof,1);
+            f_prov = zeros(ndof,1);
             for ii = 1:nel
                 for jj = 1:(nne*ni)
-                    f(obj.connecDOF(ii,jj)) = f(obj.connecDOF(ii,jj)) + Fel(jj,ii);
+                    f_prov(obj.connecDOF(ii,jj)) = f_prov(obj.connecDOF(ii,jj)) + Fel(jj,ii);
                 end
             end
-        end
-
-        function f = pointLoads(obj,f_prov)
-            ni = obj.data.ni;
             Fext = zeros(size(f_prov));
             Fext(nod2dof(ni,obj.extForces(:,1),obj.extForces(:,2))) = obj.extForces(:,3);
             f = f_prov + Fext;

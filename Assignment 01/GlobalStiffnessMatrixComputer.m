@@ -21,14 +21,14 @@ classdef GlobalStiffnessMatrixComputer < handle
         end
 
         function K = compute(obj)
-            Kel = obj.stiffnessFunction();
-            K = obj.assemblyFunction(Kel);
+            Kel = obj.calculateElemStiffness();
+            K = obj.assembleElemStifnesses(Kel);
         end
     end
 
     methods (Access = private)
 
-        function Kel = stiffnessFunction(obj)
+        function Kel = calculateElemStiffness(obj)
             nne = obj.data.nne;
             ni = obj.data.ni;
             nel = obj.data.nel;
@@ -47,7 +47,7 @@ classdef GlobalStiffnessMatrixComputer < handle
             end
         end
 
-        function K = assemblyFunction(obj,Kel)
+        function K = assembleElemStifnesses(obj,Kel)
             ndof = obj.data.ndof;
             nel = obj.data.nel;
             nne = obj.data.nne;

@@ -1,5 +1,5 @@
-classdef IterativeSolver < handle
-    
+classdef IterativeSolver < Solver
+
     properties (Access = private)
         x0
         tol
@@ -9,11 +9,16 @@ classdef IterativeSolver < handle
     methods (Access = public)
 
         function obj = IterativeSolver(cParams)
+            obj@Solver(cParams);
             obj.validateParams(cParams);
             obj.x0 = cParams.x0;
             obj.tol = cParams.tol;
             obj.maxIt = cParams.maxIt;
         end
+
+    end
+
+    methods (Access = protected)
 
         function x = solve(obj,A,b)
             x = pcg(A,b,obj.tol,obj.maxIt,[],[],obj.x0);
