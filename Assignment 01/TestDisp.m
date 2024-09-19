@@ -1,8 +1,6 @@
 classdef TestDisp < handle
 
-    properties (Access = public)
-        K
-        f
+    properties (Access = private)
         data
         matProp
         connecDOF
@@ -15,9 +13,6 @@ classdef TestDisp < handle
         tol
         maxIt
         x0
-    end
-
-    properties (Access = private)
         trueDisplacements
     end
 
@@ -27,13 +22,19 @@ classdef TestDisp < handle
             obj.init(cParams);
         end
 
-        function  u = solveAndCheckProblem(obj,sParams)
-            u = obj.solveProblem(sParams);
-            obj.verifyResults(u)
+        function  u = solveAndCheckProblem(obj)
+            u = obj.solveProblem();
+            obj.checkResults(u)
         end
     end
 
     methods (Access = private)
+
+        function u = solveProblem(obj)
+            [K,f] = obj.computeStiffnessAndForce();
+            solver = obj.createSolver();
+            u = solver.solveSystem(K,f);
+        end
 
         function init(obj,cParams)
             obj.data = cParams.data;
@@ -51,18 +52,31 @@ classdef TestDisp < handle
             obj.trueDisplacements = cParams.trueDisplacements;
         end
 
-        function u = solveProblem(obj,sParams)
-            obj.K = GlobalStiffnessMatrixComputer(sParams).compute();
-            obj.f = GlobalForceVectorComputer(sParams).compute();
-            [A,b] = SystemCreator(obj).create();
-            u = zeros(obj.data.ndof,1);
-            [up,vp,vf] = VfComputer(sParams).compute();
-            u(vp) = up;
-            solver = Solver.create(sParams);
-            u(vf) = solver.solve(A,b);
+        function [K,f] = computeStiffnessAndForce(obj)
+            sKC.data      = obj.data;
+            sKC.coord     = obj.coord;
+            sKC.connec    = obj.connec;
+            sKC.matProp   = obj.matProp;
+            sKC.connecMat = obj.connecMat;
+            sKC.connecDOF = obj.connecDOF;
+            sKC.extForces = obj.extForces;
+            stiffnessComputer = GlobalStiffnessMatrixComputer(sKC);
+            K = stiffnessComputer.compute();
+            forceComputer = GlobalForceVectorComputer(sKC);
+            f = forceComputer.compute();
         end
 
-        function verifyResults(obj,u)
+        function solver = createSolver(obj)
+            sS.x0          = obj.x0;
+            sS.tol         = obj.tol;
+            sS.data        = obj.data;
+            sS.type        = obj.type;
+            sS.maxIt       = obj.maxIt;
+            sS.prescribDOF = obj.prescribDOF;
+            solver = Solver.create(sS);
+        end
+
+        function checkResults(obj,u)
             err = norm(obj.trueDisplacements-u);
             if err <= 1e-12
                 disp('Test passed.');
@@ -70,6 +84,5 @@ classdef TestDisp < handle
                 disp(['Test failed. The error is ', num2str(err),'.']);
             end
         end
-
     end
 end
